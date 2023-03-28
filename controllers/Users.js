@@ -1,47 +1,68 @@
-import User from "../models/User.js";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+const User = require('../models/User');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const JWT_SECRET = process.env.JWT_SECRET;
 
-export const register = async (req, res) => {
+const register = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
-    const salt = await bcrypt.genSalt();
-    const passwordHash = await bcrypt.hash(password, salt);
-    const newUser = new User({
-      name,
-      email,
-      password: passwordHash,
-    });
-
-    const savedUser = await newUser.save();
-    res.status(201).json(savedUser);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    const newUser = await User.create(req.body);
+    const payload = {
+      _id: newUser._id,
+      name: newUser.name,
+      email: newUser.email,
+    };
+    const userToken = jwt.sign(payload, JWT_SECRET);
+    const options = { httpOnly: true, expires: new Date(Date.now() + 9000000) };
+    console.log('JWT TOKEN', userToken);
+    res.status(201).cookie('userToken', userToken, options).json({ user: payload });
+  } catch (error) {
+    res.status(500).json({ message: error.message, errors: error.errors });
   }
 };
-export const login = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    const user = await User.findOne({ email: email });
-    if (!user) return res.status(400).json({ msg: "User does not exist. " });
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ msg: "Invalid credentials. " });
-
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
-    delete user.password;
-    res.status(200).json({ token, user });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+const login = async (req, res) => {
+  const userDocument = await User.findOne({ email: req.body.email });
+  console.log('USER', userDocument.password, req.body.password);
+  if (!userDocument) {
+    res.status(400).json({ message: 'Invalid Login Attempt' });
+  } else {
+    try {
+      const isPasswordValid = await bcrypt.compare(req.body.password, userDocument.password);
+      if (!isPasswordValid) {
+        res.status(400).json({ message: 'Invalid Login Attempt' });
+      } else {
+        const payload = {
+          _id: userDocument._id,
+          name: userDocument.name,
+          email: userDocument.email,
+        };
+        const userToken = jwt.sign(payload, JWT_SECRET);
+        const options = { httpOnly: true, expires: new Date(Date.now() + 9000000) };
+        console.log('JWT TOKEN', userToken);
+        res.cookie('userToken', userToken, options).json({ user: payload });
+      }
+    } catch (error) {
+      res.status(500).json({ message: error.message, errors: error.errors });
+    }
   }
 };
 
-export const getUser = async (req, res) => {
+
+const logout = (req, res) => {
+  res.clearCookie('userToken');
+  res.json({ message: 'You have Successfully Logged Out!' });
+};
+const getLoggedInUser = async (req, res) => {
   try {
-    const { id } = req.params;
-    const user = await User.findById(id);
-    res.status(200).json(user);
-  } catch (err) {
-    res.status(404).json({ message: err.message });
+    const currentUser = await User.findOne({ _id: req.user._id }).select('-password');
+    res.json(currentUser);
+  } catch (error) {
+    res.status(404).json({ message: error.message });
   }
+};
+
+module.exports = {
+  register,
+  login,
+  logout,
+  getLoggedInUser,
 };
