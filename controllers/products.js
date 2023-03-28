@@ -2,7 +2,7 @@ const Product = require('../models/Product');
 
 const createProduct = async (req, res) => {
   try {
-    const newProduct = await Product.create({ ...req.body, createdBy: req.user._id });
+    const newProduct = await Product.create({ ...req.body });
     res.status(201).json(newProduct);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -11,8 +11,8 @@ const createProduct = async (req, res) => {
 
 const getAllProducts = async (req, res) => {
   try {
-    const products = await Product.find().populate('createdBy', 'username email');
-    res.json(books);
+    const products = await Product.find()
+    res.json(products);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -20,7 +20,7 @@ const getAllProducts = async (req, res) => {
 const getProductById = async (req, res) => {
   try {
     // const book = await Book.findById(req.params.id)
-    const products = await Product.find({ _id: req.params.id }).populate('createdBy', 'username email');
+    const products = await Product.find({ _id: req.params.id });
     if (products.length === 0) {
       res.status(404).json({ message: 'products Not Found' });
     }
@@ -28,17 +28,17 @@ const getProductById = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-};
+}; 
 const updateProduct = async (req, res) => {
   try {
     // const deletedBook = await Book.findByIdAndUpdate(req.params.id);
-    const updatedProduct = await Book.findOneAndUpdate({ _id: req.params.id }, req.body, {
+    const updatedProduct = await Product.findOneAndUpdate({ _id: req.params.id }, req.body, {
       new: true,
     });
     if (!updatedProduct) {
       res.status(404).json({ message: 'Product Not Found' });
     }
-    res.json(updatedBook);
+    res.json(updatedProduct);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -59,7 +59,7 @@ const deleteProduct = async (req, res) => {
 module.exports = {
 createProduct,
 getAllProducts,
-  getProductById,
+getProductById,
   updateProduct,
   deleteProduct,
 };

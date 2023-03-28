@@ -7,13 +7,13 @@ const productSchema = new mongoose.Schema(
     brand: { type: String },
     ingredients: { type: Array},
     countryOrigin: { type: String },
-    categoryName: { type: Array },
+    categoryName: { type: String },
     description: { type: String },
     photos: { type: String },
     minerals: { type: Array },
     allergens: { type: Array },
     classificationPhoto: { type: Array },
-    comment: { type: String },
+    comment: { type: Array },
   },
   { timestamps: true }
 );
