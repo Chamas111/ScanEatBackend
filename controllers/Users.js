@@ -19,32 +19,35 @@ const register = async (req, res) => {
     res.status(500).json({ message: error.message, errors: error.errors });
   }
 };
+async function isEmailValid(email) {
+  return emailValidator.validate(email)
+}
+
 const login = async (req, res) => {
-  const userDocument = await User.findOne({ email: req.body.email });
-  console.log('USER', userDocument.password, req.body.password);
-  if (!userDocument) {
-    res.status(400).json({ message: 'Invalid Login Attempt' });
-  } else {
-    try {
-      const isPasswordValid = await bcrypt.compare(req.body.password, userDocument.password);
-      if (!isPasswordValid) {
-        res.status(400).json({ message: 'Invalid Login Attempt' });
-      } else {
-        const payload = {
-          _id: userDocument._id,
-          name: userDocument.name,
-          email: userDocument.email,
-        };
-        const userToken = jwt.sign(payload, JWT_SECRET);
-        const options = { httpOnly: true, expires: new Date(Date.now() + 9000000) };
-        console.log('JWT TOKEN', userToken);
-        res.cookie('userToken', userToken, options).json({ user: payload });
-      }
-    } catch (error) {
-      res.status(500).json({ message: error.message, errors: error.errors });
+  const { email, password } = req.body;
+  try {
+    const userDocument = await User.findOne({ email });
+    if (!userDocument) {
+      return res.status(400).json({ message: 'Invalid Email' });
     }
+    const isPasswordValid = await bcrypt.compare(password, userDocument.password);
+    if (!isPasswordValid) {
+      return res.status(400).json({ message: 'Invalid Password' });
+    }
+    const payload = {
+      _id: userDocument._id,
+      name: userDocument.name,
+      email: userDocument.email,
+    };
+    const userToken = jwt.sign(payload, JWT_SECRET);
+    const options = { httpOnly: true, expires: new Date(Date.now() + 9000000) };
+    console.log('JWT TOKEN', userToken);
+    res.cookie('userToken', userToken, options).json({ user: payload });
+  } catch (error) {
+    res.status(500).json({ message: error.message, errors: error.errors });
   }
 };
+
 
 
 const logout = (req, res) => {
