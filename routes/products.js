@@ -6,9 +6,12 @@ const {
       getProductById,
       updateProduct,
       deleteProduct,
+      getProductByKeyword, 
 } = require('../controllers/products');
 const authenticate = require('../middlewares/auth');
+const productSearch = require("../middlewares/ProductSearch");
 router.use(authenticate);
+router.get('/search/:keyword', productSearch, getProductByKeyword);
 router.get('/', getAllProducts);
 router.get('/:id', getProductById);
 router.post('/', createProduct);

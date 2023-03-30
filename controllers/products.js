@@ -9,6 +9,10 @@ const createProduct = async (req, res) => {
   }
 };
 
+const getProductByKeyword = async (req, res) => {
+  res.json(req.reqUser);
+};
+
 const getAllProducts = async (req, res) => {
   try {
     const products = await Product.find()
@@ -56,10 +60,13 @@ const deleteProduct = async (req, res) => {
   }
 };
 
+
 module.exports = {
 createProduct,
 getAllProducts,
 getProductById,
   updateProduct,
   deleteProduct,
+  getProductByKeyword,
+  
 };
