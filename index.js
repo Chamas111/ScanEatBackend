@@ -14,9 +14,9 @@ app.use(cookieParser());
 app.use('/api/products', productsRouter);
 app.use('/auth', authRouter);
 
-app.get("/" , (req,res) =>{
-    res.send("hello World")
-})
+app.get('/', (req, res) => {
+  res.send('hello World');
+});
 
 if (process.env.NODE_ENV === 'production') {
   const buildPath = path.join(__dirname, '../client/build');
