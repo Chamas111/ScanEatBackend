@@ -14,7 +14,7 @@ const register = async (req, res) => {
     const userToken = jwt.sign(payload, JWT_SECRET);
     const options = { httpOnly: true, expires: new Date(Date.now() + 9000000) };
     console.log('JWT TOKEN', userToken);
-    res.status(201).cookie('userToken', userToken, options).json({ user: payload });
+    res.status(201).cookie('userToken', userToken, options).json({success: true, user: payload });
   } catch (error) {
     res.status(500).json({ message: error.message, errors: error.errors });
   }
@@ -27,9 +27,13 @@ const login = async (req, res) => {
   const { email, password } = req.body;
   try {
     const userDocument = await User.findOne({ email });
-    if (!userDocument) {
-      return res.status(400).json({ message: 'Invalid Email' });
-    }
+    
+    if (!userDocument) 
+      return res.json({
+        success: false,
+        message: 'email / password does not match!',
+      });
+
     const isPasswordValid = await bcrypt.compare(password, userDocument.password);
     if (!isPasswordValid) {
       return res.status(400).json({ message: 'Invalid Password' });
@@ -42,7 +46,7 @@ const login = async (req, res) => {
     const userToken = jwt.sign(payload, JWT_SECRET);
     const options = { httpOnly: true, expires: new Date(Date.now() + 9000000) };
     console.log('JWT TOKEN', userToken);
-    res.cookie('userToken', userToken, options).json({ user: payload });
+    res.cookie('userToken', userToken, options).json({ success: true, user: payload });
   } catch (error) {
     res.status(500).json({ message: error.message, errors: error.errors });
   }
