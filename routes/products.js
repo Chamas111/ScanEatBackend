@@ -9,10 +9,10 @@ const {
   deleteProduct,
   getProductByKeyword,
 } = require("../controllers/products");
-const authenticate = require("../middlewares/auth");
+// const authenticate = require("../middlewares/auth");
 const productSearch = require("../middlewares/ProductSearch");
-router.use(authenticate);
-router.get('/search/:keyword', productSearch, getProductByKeyword);
+// router.use(authenticate);
+router.get("/search/:keyword", productSearch, getProductByKeyword);
 router.get("/", getAllProducts);
 router.get("/:id", getProductById);
 router.get("/scan/:barcode", getProductByBarcode);
@@ -21,5 +21,3 @@ router.put("/:id", updateProduct);
 router.delete("/:id", deleteProduct);
 
 module.exports = router;
-
-
