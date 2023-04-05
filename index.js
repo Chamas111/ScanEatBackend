@@ -3,7 +3,8 @@ const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/db');
 const productsRouter = require('./routes/products');
-const authRouter = require('./routes/users');
+const authRouter = require('./routes/auth');
+const userRouter = require('./routes/users');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const PORT = process.env.PORT || 9000;
@@ -12,6 +13,7 @@ app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 app.use('/api/products', productsRouter);
+app.use('/api/users', userRouter);
 app.use('/auth', authRouter);
 
 app.get('/', (req, res) => {

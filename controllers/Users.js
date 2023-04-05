@@ -2,6 +2,8 @@ const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const JWT_SECRET = process.env.JWT_SECRET;
+const Product = require("../models/Product");
+const { response } = require("express");
 
 const register = async (req, res) => {
   try {
@@ -81,9 +83,57 @@ const getLoggedInUser = async (req, res) => {
   }
 };
 
+
+const getHistoryUser = async (req, res) => {
+  try {
+ 
+    const updatedHistory = await Product.findOneAndUpdate({ _id: req.params.id }, req.body, {
+      new: true,
+    });
+    if (!updatedHistory) {
+      res.status(404).json({ message: 'There is no history'});
+    }
+    res.json(updatedHistory);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+/* const updateUserHistory = async (req, res) => {
+  try {
+ 
+    const updatedHistory = await Product.findOneAndUpdate({ _id: req.params.id }, req.body, {
+      new: true,
+    });
+    if (!updatedHistory) {
+      res.status(404).json({ message: 'There is no history'});
+    }
+    res.json(updatedHistory);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}; */
+const updateUserHistory = async (userId, productId) => {
+ try{
+  const userUpdatedHistory = await User.findOneAndUpdate( 
+    { _id: userId }, // the query condition to match the document
+    { $push: { history: productId } }, // the update operation to push the new element
+    { new: true }, // options to return the updated document
+  
+  );
+  
+
+ }catch (error) {
+ console.log(error.message);
+ }
+
+}
 module.exports = {
   register,
   login,
   logout,
   getLoggedInUser,
+  getHistoryUser,
+  updateUserHistory,
 };
