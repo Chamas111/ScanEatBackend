@@ -84,21 +84,15 @@ const getLoggedInUser = async (req, res) => {
 };
 
 
+//still not worked
 const getHistoryUser = async (req, res) => {
   try {
- 
-    const updatedHistory = await Product.findOneAndUpdate({ _id: req.params.id }, req.body, {
-      new: true,
-    });
-    if (!updatedHistory) {
-      res.status(404).json({ message: 'There is no history'});
-    }
-    res.json(updatedHistory);
+    const getHisUser = await User.find().populate('createdBy', 'username email');
+    res.json(books);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
-
 
 /* const updateUserHistory = async (req, res) => {
   try {
