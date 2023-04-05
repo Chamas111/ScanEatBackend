@@ -45,6 +45,29 @@ const getProductByBarcode = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+const addCommentToProduct = async (req, res) => {
+  try {
+    const productId = req.params.id;
+    const comment = req.body.comment;
+
+    const product = await Product.findById(productId);
+
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    product.comment.push(comment);
+    await product.save();
+
+    res.status(200).json({
+      message: "Comment added successfully",
+      comment: product.comment,
+    });
+  } catch (error) {
+    console.error("Error adding comment to product:", error);
+    res.status(500).json({ message: "Error adding comment to product" });
+  }
+};
 const updateProduct = async (req, res) => {
   try {
     // const deletedBook = await Book.findByIdAndUpdate(req.params.id);
@@ -78,7 +101,6 @@ const deleteProduct = async (req, res) => {
   }
 };
 
-
 module.exports = {
   createProduct,
   getAllProducts,
@@ -87,5 +109,5 @@ module.exports = {
   updateProduct,
   deleteProduct,
   getProductByKeyword,
-  
+  addCommentToProduct,
 };
