@@ -160,7 +160,7 @@ const updateUserHistory = async (userId, productId) => {
  try{
   const userUpdatedHistory = await User.findOneAndUpdate( 
     { _id: userId }, // the query condition to match the document
-    { $push: { history: productId } }, // the update operation to push the new element
+    { $addToSet: { history: productId } }, // the update operation to push the new element
     { new: true }, // options to return the updated document
   
   );
@@ -171,11 +171,42 @@ const updateUserHistory = async (userId, productId) => {
  }
 
 }
+const updateUser = async (req, res, next) => {
+  try {
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: req.params.id },
+      req.body,
+      { new: true, runValidators: true }
+    );
+
+    res.json(updatedUser);
+  } catch (error) {
+    next(
+      res.status(500).json({ message: error.message, errors: error.errors })
+    );
+  }
+};
+const deleteHistory = async (req, res) => {
+  try{
+    const userDeletedHistory = await User.findOneAndUpdate( 
+      { _id: req.params.id }, // the query condition to match the document
+      { $pull: { history: req.params.productId } }, // the update operation to push the new element
+      { new: true }, // options to return the updated document
+    
+    );
+    
+  
+    res.json(userDeletedHistory);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 module.exports = {
   register,
   login,
   logout,
   getLoggedInUser,
-  
+  deleteHistory,
   updateUserHistory,
+  updateUser,
 };
