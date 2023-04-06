@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema(
     },
     history: {
       type: [mongoose.Schema.Types.ObjectId],
-      ref: 'Product',
+      ref: 'product',
     },
   },
   { timestamps: true }

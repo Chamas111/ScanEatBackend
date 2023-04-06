@@ -6,7 +6,7 @@ router.post('/register', register);
 router.post('/login', login);
 router.post('/logout', logout);
 router.get('/loggedin-user', authenticate, getLoggedInUser);
-router.get('/history',  authenticate, getHistoryUser)
+//router.get('/history',  authenticate, getHistoryUser)
 router.put('/:id/history',  authenticate, updateUserHistory);
 
 module.exports = router;
