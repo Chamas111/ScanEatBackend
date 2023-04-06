@@ -10,9 +10,9 @@ const {
   getProductByKeyword,
   addCommentToProduct,
 } = require("../controllers/products");
-// const authenticate = require("../middlewares/auth");
+const authenticate = require("../middlewares/auth");
 const productSearch = require("../middlewares/ProductSearch");
-// router.use(authenticate);
+router.use(authenticate);
 router.get("/search/:keyword", productSearch, getProductByKeyword);
 router.get("/", getAllProducts);
 router.get("/:id", getProductById);

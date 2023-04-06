@@ -1,4 +1,5 @@
 const Product = require("../models/Product");
+const {updateUserHistory} = require("./Users");
 
 const createProduct = async (req, res) => {
   try {
@@ -39,6 +40,7 @@ const getProductByBarcode = async (req, res) => {
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
+    updateUserHistory(req.user._id , product._id);
     res.json(product);
   } catch (err) {
     console.error(err);
@@ -110,4 +112,5 @@ module.exports = {
   deleteProduct,
   getProductByKeyword,
   addCommentToProduct,
+  
 };
